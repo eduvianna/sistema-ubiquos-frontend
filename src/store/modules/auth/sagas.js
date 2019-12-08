@@ -8,7 +8,7 @@ export function* signIn({ payload }) {
   try {
     const { email, password } = payload;
 
-    const response = yield call(api.post, 'sessions', { email, password });
+    const response = yield call(api.post, 'login', { email, password });
 
     const { token, user } = response.data;
 
@@ -26,7 +26,11 @@ export function* signIn({ payload }) {
 export function* signUp({ payload }) {
   try {
     const { name, email, password } = payload;
-    yield call(api.post, 'users', { name, email, password });
+    yield call(api.post, 'register', {
+      name,
+      email,
+      password_unhash: password,
+    });
 
     return history.push('/');
   } catch (err) {
