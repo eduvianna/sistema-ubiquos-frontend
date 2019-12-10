@@ -2,7 +2,7 @@ import styled from 'styled-components';
 import { darken } from 'polished';
 
 export const Container = styled.div`
-  max-width: 800px;
+  max-width: 600px;
   margin: 50px auto;
 
   form {
@@ -79,8 +79,6 @@ export const Container = styled.div`
     }
 
     button:first-of-type {
-      width: 20%;
-      margin-left: 80%;
       margin-bottom: 50px;
       height: 44px;
       background: #00ab66;
