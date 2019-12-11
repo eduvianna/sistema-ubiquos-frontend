@@ -1,6 +1,5 @@
 /* eslint-disable react/no-array-index-key */
 import React, { useState } from 'react';
-import * as Yup from 'yup';
 import { Form, Input, Scope } from '@rocketseat/unform';
 import { Link } from 'react-router-dom';
 import { toast } from 'react-toastify';
@@ -12,12 +11,6 @@ import history from '~/services/history';
 import SensorInput from './SensorInput';
 
 import { Container } from './styles';
-
-const schema = Yup.object().shape({
-  host: Yup.string().required('Host é obrigatório'),
-  name: Yup.string().required('Nome é obrigatório'),
-  description: Yup.string().required('A Descrição é obrigatória'),
-});
 
 export default function CreateProject() {
   const [sensors, setSensors] = useState([]);
@@ -74,7 +67,7 @@ export default function CreateProject() {
 
   return (
     <Container>
-      <Form schema={schema} onSubmit={handleSubmit}>
+      <Form onSubmit={handleSubmit}>
         <Input name="name" placeholder="Nome do projeto" />
         <Input name="host" placeholder="Host projeto" />
         <Input name="description" multiline placeholder="Descrição projeto" />

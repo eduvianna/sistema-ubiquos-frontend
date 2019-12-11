@@ -1,8 +1,10 @@
 import styled from 'styled-components';
+import 'react-dates/lib/css/_datepicker.css';
+
 import { darken } from 'polished';
 
 export const Container = styled.div`
-  max-width: 1200px;
+  max-width: 900px;
   margin: 50px auto;
   display: flex;
   flex-direction: column;
@@ -25,23 +27,6 @@ export const Container = styled.div`
     margin: 5px;
     font-size: 16px;
     width: 25%;
-
-    &::placeholder {
-      color: rgba(0, 0, 0, 0.5);
-    }
-  }
-  input {
-    text-align: center;
-    background: rgba(0, 0, 0, 0.1);
-
-    border: 0;
-    border-radius: 4px;
-    height: 44px;
-    padding: 0 15px;
-    color: #000;
-    margin: 5px;
-    font-size: 16px;
-    width: 15%;
 
     &::placeholder {
       color: rgba(0, 0, 0, 0.5);

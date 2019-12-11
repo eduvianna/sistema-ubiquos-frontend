@@ -1,9 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import {
-  DateRangePicker,
-  SingleDatePicker,
-  DayPickerRangeController,
-} from 'react-dates';
+
+import 'react-dates/initialize';
+import { DateRangePicker } from 'react-dates';
 
 import api from '~/services/api';
 
@@ -11,10 +9,24 @@ import { Container } from './styles';
 
 export default function Report() {
   const [projects, setProjects] = useState([]);
+  const [sensors, setSensors] = useState([]);
   const [disabled, setDisabled] = useState(true);
-  const [startDay, setStartDay] = useState(new Date());
-  const [startFocusDay, setStartFocusDay] = useState(false);
+  const [startDay, setStartDay] = useState(null);
+  const [endDay, setEndDay] = useState(null);
+  const [focusInput, setFocusInput] = useState(null);
 
+  function getSensors(projectID) {
+    console.log(projectID);
+    const project = projects.find(element => element.id === projectID);
+
+    if (project.sensors.length > 0) {
+      setSensors(project.sensors);
+      return setDisabled(!disabled);
+    }
+
+    setSensors([]);
+    return setDisabled(!disabled);
+  }
   useEffect(() => {
     async function loadProjects() {
       const response = await api.get('list-projects');
@@ -28,7 +40,11 @@ export default function Report() {
   return (
     <Container>
       <div>
-        <select>
+        <select
+          onChange={option =>
+            option.target.value && getSensors(option.target.value)
+          }
+        >
           <option>Selecione um projeto</option>
           {projects.map(project => (
             <option key={project.id} value={project.id}>
@@ -38,18 +54,27 @@ export default function Report() {
         </select>
         <select disabled={disabled}>
           <option>Selecione um sensor</option>
-          {projects.map(project => (
-            <option key={project.id}>{project.name}</option>
+          {sensors.map(sensor => (
+            <option key={sensor.id}>{sensor.name}</option>
           ))}
         </select>
-        <SingleDatePicker
-          date={startDay} // momentPropTypes.momentObj or null
-          onDateChange={date => setStartDay({ date })} // PropTypes.func.isRequired
-          focused={startFocusDay} // PropTypes.bool
-          onFocusChange={({ focused }) => setStartFocusDay({ focused })} // PropTypes.func.isRequired
-          id="your_unique_id" // PropTypes.string.isRequired,
+
+        <DateRangePicker
+          startDate={startDay}
+          startDateId="start_date"
+          startDatePlaceholderText="Data Inicio"
+          minimumNights={0}
+          endDate={endDay}
+          endDateId="end_date"
+          endDatePlaceholderText="Data Final"
+          onDatesChange={({ startDate, endDate }) => {
+            setStartDay(startDate);
+            setEndDay(endDate);
+          }}
+          focusedInput={focusInput}
+          onFocusChange={focusedInput => setFocusInput(focusedInput)}
+          displayFormat="DD/MM/YYYY"
         />
-        <input type="date" />
         <button type="button">Selecionar</button>
       </div>
     </Container>
