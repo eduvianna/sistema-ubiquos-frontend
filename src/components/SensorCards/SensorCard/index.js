@@ -15,48 +15,48 @@ import api from '~/services/api';
 
 import { Container, Card, InfoTime } from './styles';
 
+function checkLastUpdate(date, compareDate) {
+  let lastUpdate = differenceInYears(date, compareDate);
+  if (lastUpdate === 0) {
+    lastUpdate = differenceInDays(date, compareDate);
+    if (lastUpdate > 0 && lastUpdate <= 31) {
+      return lastUpdate >= 1
+        ? `Atualizado há ${lastUpdate} dia`
+        : `Atualizado há ${lastUpdate} dias`;
+    }
+    if (lastUpdate >= 31) {
+      lastUpdate = differenceInMonths(date, compareDate);
+      return lastUpdate >= 1
+        ? `Atualizado há ${lastUpdate} mês`
+        : `Atualizado há ${lastUpdate} meses`;
+    }
+    lastUpdate = differenceInHours(date, compareDate);
+    if (lastUpdate < 1) {
+      lastUpdate = differenceInMinutes(date, compareDate);
+
+      if (lastUpdate < 1) {
+        lastUpdate = differenceInSeconds(date, compareDate);
+        return lastUpdate >= 1
+          ? `Atualizado há ${lastUpdate} segundo`
+          : `Atualizado há ${lastUpdate} segundos`;
+      }
+      return lastUpdate >= 1
+        ? `Atualizado há ${lastUpdate} minuto`
+        : `Atualizado há ${lastUpdate} minutos`;
+    }
+    return lastUpdate >= 1
+      ? `Atualizado há ${lastUpdate} hora`
+      : `Atualizado há ${lastUpdate} horas`;
+  }
+  return lastUpdate >= 1
+    ? `Atualizado há ${lastUpdate} ano`
+    : `Atualizado há ${lastUpdate} anos`;
+}
+
 export default function SensorCard({ sensor_id, infoSensor }) {
   const [sensor, setSensor] = useState({ created_at: '' });
 
   useEffect(() => {
-    function checkLastUpdate(date, compareDate) {
-      let lastUpdate = differenceInYears(date, compareDate);
-      if (lastUpdate === 0) {
-        lastUpdate = differenceInDays(date, compareDate);
-        if (lastUpdate > 0 && lastUpdate <= 31) {
-          return lastUpdate >= 1
-            ? `Atualizado há ${lastUpdate} dia`
-            : `Atualizado há ${lastUpdate} dias`;
-        }
-        if (lastUpdate >= 31) {
-          lastUpdate = differenceInMonths(date, compareDate);
-          return lastUpdate >= 1
-            ? `Atualizado há ${lastUpdate} mês`
-            : `Atualizado há ${lastUpdate} meses`;
-        }
-        lastUpdate = differenceInHours(date, compareDate);
-        if (lastUpdate < 1) {
-          lastUpdate = differenceInMinutes(date, compareDate);
-
-          if (lastUpdate < 1) {
-            lastUpdate = differenceInSeconds(date, compareDate);
-            return lastUpdate >= 1
-              ? `Atualizado há ${lastUpdate} segundo`
-              : `Atualizado há ${lastUpdate} segundos`;
-          }
-          return lastUpdate >= 1
-            ? `Atualizado há ${lastUpdate} minuto`
-            : `Atualizado há ${lastUpdate} minutos`;
-        }
-        return lastUpdate >= 1
-          ? `Atualizado há ${lastUpdate} hora`
-          : `Atualizado há ${lastUpdate} horas`;
-      }
-      return lastUpdate >= 1
-        ? `Atualizado há ${lastUpdate} ano`
-        : `Atualizado há ${lastUpdate} anos`;
-    }
-
     const timer = setInterval(() => {
       api
         .get('list-measurement', { params: { sensor: sensor_id } })
