@@ -3,7 +3,12 @@ import { takeLatest, call, put, all } from 'redux-saga/effects';
 import { toast } from 'react-toastify';
 
 import api from '~/services/api';
-import { updateProfileSuccess, updateProfileFailure } from './actions';
+import {
+  updateProfileSuccess,
+  updateProfileFailure,
+  selectProjectSuccess,
+  selectProjectFailure,
+} from './actions';
 
 export function* updateProfile({ payload }) {
   try {
@@ -26,4 +31,24 @@ export function* updateProfile({ payload }) {
   }
 }
 
-export default all([takeLatest('@user/UPDATE_PROFILE_REQUEST', updateProfile)]);
+export function* selectProject() {
+  try {
+    const response = yield call(api.get, 'list-projects');
+    const projects = [];
+    response.data.map(
+      element => element.sensors.length > 0 && projects.push(element)
+    );
+    const index = Math.floor(Math.random() * projects.length);
+    return yield put(selectProjectSuccess(projects[index]));
+  } catch (err) {
+    toast.error(
+      'Não foi possível coletar algumas informações dos seus projetos'
+    );
+    return yield put(selectProjectFailure());
+  }
+}
+
+export default all([
+  takeLatest('@user/UPDATE_PROFILE_REQUEST', updateProfile),
+  takeLatest('@user/SELECT_PROJECT_REQUEST', selectProject),
+]);

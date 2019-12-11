@@ -1,49 +1,45 @@
 /* eslint-disable consistent-return */
 /* eslint-disable array-callback-return */
-import React, { useState, useEffect } from 'react';
+import React, { useEffect } from 'react';
+import { useSelector, useDispatch } from 'react-redux';
 
 import SensorCard from './SensorCard';
 
-import api from '~/services/api';
 import { Container } from './styles';
+import {
+  selectProjectRequest,
+  clearProject,
+} from '~/store/modules/user/actions';
 
 export default function Dashboard() {
-  const [project, setProject] = useState({ projects: [] });
+  const dispatch = useDispatch();
+  let project = useSelector(state => state.user.project);
+
   useEffect(() => {
-    async function loadProject() {
-      const response = await api.get('list-projects');
-      const projects = [];
-      response.data.map(
-        element => element.sensors.length > 0 && projects.push(element)
-      );
-      setProject({
-        projects,
-        index: Math.floor(Math.random() * projects.length),
-      });
+    if (project === null) {
+      dispatch(selectProjectRequest());
     }
-    loadProject();
+    return () => {
+      dispatch(clearProject());
+    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [setProject]);
+  }, []);
+  project = useSelector(state => state.user.project);
+
   return (
     <Container>
-      {project.projects &&
-        project.projects.map((element, index) => {
-          if (index === project.index) {
-            for (let i = 0; i < 4; i += 1) {
-              if (i < element.sensors.length) {
-                return (
-                  <SensorCard
-                    key={element.sensors[i].id}
-                    infoSensor={element.sensors[i]}
-                    sensor_id={element.sensors[i].id}
-                  />
-                );
-              }
-            }
-
-            return element.sensors;
-          }
-        })}
+      {project &&
+        project.sensors &&
+        project.sensors.map(
+          (element, index) =>
+            index < 4 && (
+              <SensorCard
+                key={element.id}
+                infoSensor={element}
+                sensor_id={element.id}
+              />
+            )
+        )}
     </Container>
   );
 }

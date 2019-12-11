@@ -1,76 +1,101 @@
 import React, { useState, useEffect } from 'react';
-import range from 'lodash/range';
-import last from 'lodash/last';
-import * as time from 'd3-time';
-import { timeFormat } from 'd3-time-format';
+import PropTypes from 'prop-types';
 import { Line } from '@nivo/line';
+import { utcToZonedTime } from 'date-fns-tz';
 
-export default function RealTimeChart() {
-  const date = new Date();
+import api from '~/services/api';
 
-  const formatTime = timeFormat('%Y %b %d');
+const date = new Date();
+const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
 
-  const [datas, setDatas] = useState({
-    dataA: range(100).map(i => ({
-      x: time.timeMinute.offset(date, i * 30),
-      y: 10 + Math.round(Math.random() * 20),
-    })),
-    dataB: range(100).map(i => ({
-      x: time.timeMinute.offset(date, i * 30),
-      y: 30 + Math.round(Math.random() * 20),
-    })),
-    dataC: range(100).map(i => ({
-      x: time.timeMinute.offset(date, i * 30),
-      y: 60 + Math.round(Math.random() * 20),
-    })),
-  });
-
+export default function RealTimeChart({ sensor_id }) {
+  const [datas, setDatas] = useState([{ x: date, y: 0 }]);
   useEffect(() => {
+    async function getMeasurements() {
+      const response = await api.get('list-measurement', {
+        params: { sensor: sensor_id },
+      });
+
+      if (response.data.measurements.length > 0) {
+        // eslint-disable-next-line array-callback-return
+        response.data.measurements.map(element => {
+          element.x = utcToZonedTime(element.created_at, timezone);
+          element.y = element.value;
+          delete element.created_at;
+          delete element.value;
+        });
+
+        setDatas(response.data.measurements);
+      }
+    }
+
     const timer = setInterval(() => {
-      const dataA = datas.dataA.slice(1);
-      dataA.push({
-        x: time.timeMinute.offset(last(dataA).x, 30),
-        y: 10 + Math.round(Math.random() * 20),
-      });
-
-      const dataB = datas.dataB.slice(1);
-      dataB.push({
-        x: time.timeMinute.offset(last(dataB).x, 30),
-        y: 30 + Math.round(Math.random() * 20),
-      });
-      const dataC = datas.dataC.slice(1);
-      dataC.push({
-        x: time.timeMinute.offset(last(dataC).x, 30),
-        y: 60 + Math.round(Math.random() * 20),
-      });
-
-      setDatas({ dataA, dataB, dataC });
+      getMeasurements();
     }, 2000);
 
     return () => {
       clearInterval(timer);
     };
-  }, [datas]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   return (
-    <Line
-      width={1200}
+    <>
+      {datas && (
+        <Line
+          width={760}
+          height={400}
+          animate
+          margin={{ top: 30, right: 100, bottom: 60, left: 120 }}
+          data={[{ id: 'Sensor 1', data: datas }]}
+          xScale={{ type: 'time', format: 'native' }}
+          yScale={{ type: 'linear', max: 100 }}
+          axisBottom={{
+            format: '%H:%M',
+            tickValues: 'every 4 hour',
+            legend: 'Tempo (horas)',
+            legendPosition: 'middle',
+            legendOffset: 46,
+          }}
+          enablePoints
+          enableGridX
+          curve="monotoneX"
+          motionStiffness={120}
+          motionDamping={50}
+          isInteractive={false}
+          enableSlices={false}
+          useMesh
+          pointColor={{ theme: 'background' }}
+          pointBorderWidth={1}
+          pointBorderColor={{ from: 'serieColor' }}
+          pointLabel="y"
+          pointLabelYOffset={0}
+          theme={{
+            axis: { ticks: { text: { fontSize: 12 } } },
+            grid: { line: { stroke: '#ddd', strokeDasharray: '1 2' } },
+          }}
+        />
+      )}
+    </>
+  );
+}
+
+RealTimeChart.propTypes = {
+  // eslint-disable-next-line react/forbid-prop-types
+  sensor_id: PropTypes.number.isRequired,
+};
+/* <Line
+      width={760}
       height={400}
       animate
-      margin={{ top: 30, right: 150, bottom: 60, left: 50 }}
-      data={[
-        { id: 'Sensor 1', data: datas.dataA },
-        { id: 'Sensor 2', data: datas.dataB },
-        { id: 'Sensor 3', data: datas.dataC },
-      ]}
+      margin={{ top: 30, right: 100, bottom: 60, left: 120 }}
+      data={[{ id: 'Sensor 1', data: datas.dataA }]}
       xScale={{ type: 'time', format: 'native' }}
       yScale={{ type: 'linear', max: 100 }}
       axisBottom={{
-        format: '%H:%M:%S',
+        format: '%H:%M',
         tickValues: 'every 4 hour',
-        legend: `${formatTime(datas.dataA[0].x)} ——— ${formatTime(
-          last(datas.dataA).x
-        )}`,
+        legend: 'Tempo (horas)',
         legendPosition: 'middle',
         legendOffset: 46,
       }}
@@ -83,40 +108,12 @@ export default function RealTimeChart() {
       enableSlices={false}
       useMesh
       pointColor={{ theme: 'background' }}
-      pointBorderWidth={2}
+      pointBorderWidth={1}
       pointBorderColor={{ from: 'serieColor' }}
       pointLabel="y"
-      pointLabelYOffset={-12}
+      pointLabelYOffset={0}
       theme={{
-        axis: { ticks: { text: { fontSize: 14 } } },
+        axis: { ticks: { text: { fontSize: 12 } } },
         grid: { line: { stroke: '#ddd', strokeDasharray: '1 2' } },
       }}
-      legends={[
-        {
-          anchor: 'bottom-right',
-          direction: 'column',
-          justify: false,
-          translateX: 100,
-          translateY: 0,
-          itemsSpacing: 0,
-          itemDirection: 'left-to-right',
-          itemWidth: 80,
-          itemHeight: 20,
-          itemOpacity: 0.75,
-          symbolSize: 12,
-          symbolShape: 'circle',
-          symbolBorderColor: 'rgba(0, 0, 0, .5)',
-          effects: [
-            {
-              on: 'hover',
-              style: {
-                itemBackground: 'rgba(0, 0, 0, .03)',
-                itemOpacity: 0.6,
-              },
-            },
-          ],
-        },
-      ]}
-    />
-  );
-}
+    /> */

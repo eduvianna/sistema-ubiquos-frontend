@@ -11,6 +11,7 @@ import Dashboard from '../pages/Dashboard';
 import Profile from '../pages/Profile';
 import Project from '../pages/Project';
 import CreateProject from '../pages/CreateProject';
+import Report from '~/pages/Report';
 
 export default function Routes() {
   return (
@@ -22,6 +23,8 @@ export default function Routes() {
 
       <Route path="/project" component={Project} isPrivate />
       <Route path="/create-project" component={CreateProject} isPrivate />
+
+      <Route path="/reports" component={Report} isPrivate />
     </Switch>
   );
 }

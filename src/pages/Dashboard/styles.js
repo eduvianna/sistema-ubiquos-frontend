@@ -1,9 +1,18 @@
 import styled from 'styled-components';
 
 export const Container = styled.div`
-  max-width: 1200px;
+  max-width: 1260px;
   margin: 50px auto;
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  align-items: center;
+`;
 
+export const Card = styled.div`
+  width: 600px;
+  margin: 15px;
+  align-items: center;
   display: flex;
   flex-direction: column;
   border-radius: 6px;
