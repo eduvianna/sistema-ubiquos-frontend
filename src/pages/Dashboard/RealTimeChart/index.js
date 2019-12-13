@@ -84,36 +84,3 @@ RealTimeChart.propTypes = {
   // eslint-disable-next-line react/forbid-prop-types
   sensor_id: PropTypes.number.isRequired,
 };
-/* <Line
-      width={760}
-      height={400}
-      animate
-      margin={{ top: 30, right: 100, bottom: 60, left: 120 }}
-      data={[{ id: 'Sensor 1', data: datas.dataA }]}
-      xScale={{ type: 'time', format: 'native' }}
-      yScale={{ type: 'linear', max: 100 }}
-      axisBottom={{
-        format: '%H:%M',
-        tickValues: 'every 4 hour',
-        legend: 'Tempo (horas)',
-        legendPosition: 'middle',
-        legendOffset: 46,
-      }}
-      enablePoints
-      enableGridX
-      curve="monotoneX"
-      motionStiffness={120}
-      motionDamping={50}
-      isInteractive={false}
-      enableSlices={false}
-      useMesh
-      pointColor={{ theme: 'background' }}
-      pointBorderWidth={1}
-      pointBorderColor={{ from: 'serieColor' }}
-      pointLabel="y"
-      pointLabelYOffset={0}
-      theme={{
-        axis: { ticks: { text: { fontSize: 12 } } },
-        grid: { line: { stroke: '#ddd', strokeDasharray: '1 2' } },
-      }}
-    /> */
