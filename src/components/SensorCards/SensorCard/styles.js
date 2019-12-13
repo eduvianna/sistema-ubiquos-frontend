@@ -41,7 +41,6 @@ export const Card = styled.div`
   > strong {
     display: block;
     font-size: 28px;
-
     color: #00ab66;
   }
 `;
